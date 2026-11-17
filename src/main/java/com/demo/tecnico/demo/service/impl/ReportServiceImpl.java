@@ -3,6 +3,7 @@ package com.demo.tecnico.demo.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.demo.tecnico.demo.entity.CuentaEntity;
 import com.demo.tecnico.demo.entity.EventoEntity;
+import com.demo.tecnico.demo.entity.OperacionEntity;
 import com.demo.tecnico.demo.enums.EstatusEventoEnum;
 import com.demo.tecnico.demo.enums.TipoOperacionEnum;
 import com.demo.tecnico.demo.repository.CuentasRepository;
@@ -44,12 +46,16 @@ public class ReportServiceImpl implements ReportService {
 						cuenta.getCliente().getNombreCompleto(),
 						obtenSaldoIncial(cuenta.getLstEventos(), cuenta.getSaldo()),
 
-						mapGroup.get(TipoOperacionEnum.OPERACION_ABONO.getNombre()),
-						mapGroup.get(TipoOperacionEnum.OPERACION_CARGO.getNombre()), cuenta.getSaldo(),
-
-						mapStatusOperacion.get(EstatusEventoEnum.APROVADA.getNombre()),
-						mapStatusOperacion.get(EstatusEventoEnum.RECHAZADA.getNombre()),
-						mapStatusOperacion.get(EstatusEventoEnum.DUPLICADA.getNombre()));
+						validateValue(mapGroup.get(TipoOperacionEnum.OPERACION_ABONO.getNombre())),
+						validateValue(mapGroup.get(TipoOperacionEnum.OPERACION_CARGO.getNombre())),
+						cuenta.getSaldo(),
+						validateValue(mapStatusOperacion.get(EstatusEventoEnum.APROVADA.getNombre())),
+						validateValue(mapStatusOperacion.get(EstatusEventoEnum.RECHAZADA.getNombre())),
+						validateValue(mapStatusOperacion.get(EstatusEventoEnum.DUPLICADA.getNombre())));
+			} else {
+				detalle = new ReporteFinalResponseRecord(cuenta.getNumeroCuenta(),
+						cuenta.getCliente().getNombreCompleto(), cuenta.getSaldo(), 0L, 0L, cuenta.getSaldo(), 0L, 0L,
+						0L);
 			}
 			return detalle;
 		}).toList();
@@ -57,8 +63,14 @@ public class ReportServiceImpl implements ReportService {
 		return lstDetalle;
 	}
 
+	public Long validateValue(Long val) {
+		return val == null ? 0L : val;
+	}
+
 	public BigDecimal obtenSaldoIncial(List<EventoEntity> lst, BigDecimal saldo) {
-		return lst.stream().reduce(saldo,
+		return lst.stream()
+				.filter(eve -> eve.getStatusEvento().equals(EstatusEventoEnum.APROVADA.getNombre()))
+				.reduce(saldo,
 				(acumulado,
 						eve) -> TipoOperacionEnum.OPERACION_ABONO.getNombre()
 								.equals(eve.getOperacion().getTipoOperacion())
@@ -73,15 +85,21 @@ public class ReportServiceImpl implements ReportService {
 		List<EventoEntity> list = eventoRepository.findAll();
 		Map<String, Long> mapGroup = list.stream()
 				.collect(Collectors.groupingBy(evento -> evento.getStatusEvento(), Collectors.counting()));
+		ReporteGlobalResponseRecord re = null;
+		if (list != null && !list.isEmpty()) {
+			re = new ReporteGlobalResponseRecord(list.size(), mapGroup.get(EstatusEventoEnum.APROVADA.getNombre()),
+					validateValue(mapGroup.get(EstatusEventoEnum.RECHAZADA.getNombre())),
+					validateValue(mapGroup.get(EstatusEventoEnum.DUPLICADA.getNombre())),
 
-		ReporteGlobalResponseRecord re = new ReporteGlobalResponseRecord(list.size(),
-				mapGroup.get(EstatusEventoEnum.APROVADA.getNombre()),
-				mapGroup.get(EstatusEventoEnum.RECHAZADA.getNombre()),
-				mapGroup.get(EstatusEventoEnum.DUPLICADA.getNombre()),
-				list.stream()
-						.filter(eve -> eve.getOperacion().getEstatus().equals(EstatusEventoEnum.APROVADA.getNombre()))
-						.map(eve -> eve.getOperacion().getMonto()).reduce(BigDecimal.ZERO, BigDecimal::add));
-
+					list.stream().filter(eve -> eve.getStatusEvento().equals(EstatusEventoEnum.APROVADA.getNombre()))
+							.map(EventoEntity::getOperacion) // 1. Accedes al subobjeto
+							.filter(Objects::nonNull) // 2. Evitas NullPointerException si el subobjeto es nulo
+							.map(OperacionEntity::getMonto) // 3. Extraes el BigDecimal
+							.filter(Objects::nonNull) // 4. Evitas NullPointerException si el monto es nulo
+							.reduce(BigDecimal.ZERO, BigDecimal::add));
+		} else {
+			re = new ReporteGlobalResponseRecord(0, 0L, 0L, 0L, BigDecimal.ZERO);
+		}
 		return re;
 	}
 

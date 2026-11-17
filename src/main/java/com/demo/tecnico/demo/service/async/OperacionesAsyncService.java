@@ -47,7 +47,7 @@ public class OperacionesAsyncService {
 				return CompletableFuture.completedFuture(
 						returnResponseOpe(EstatusEventoEnum.DUPLICADA.getNombre(), entity.getEstatus(), entity, msgOperacion, null, null));
 			}
-			entity = entity != null ? entity :new OperacionEntity(operacion) ;
+			entity = entity != null ? requestToEntity(entity, operacion) :new OperacionEntity(operacion) ;
 
 			CuentaEntity cuenta = cuentasRepository.findByIdLock(operacion.idCuenta());
 			if (cuenta == null) {
@@ -79,7 +79,15 @@ public class OperacionesAsyncService {
 		}
 	}
 
-	public OperacionResponseRecord returnResponseOpe(String estatusEvento, String statusOperacion, OperacionEntity operacion, String msgOperacion,
+
+	private OperacionEntity requestToEntity(OperacionEntity operacion, OperacionRequestRecord request) {
+		operacion.setMonto(request.monto());
+		operacion.setTipoOperacion(request.tipoOperacion());
+		operacion.setCuenta(new CuentaEntity(request.idCuenta()));
+		return operacion;
+	}
+
+	private OperacionResponseRecord returnResponseOpe(String estatusEvento, String statusOperacion, OperacionEntity operacion, String msgOperacion,
 			BigDecimal saldoInicial, BigDecimal saldoFinal) {
 		try {
 			operacion.setEstatus(statusOperacion);
@@ -92,7 +100,7 @@ public class OperacionesAsyncService {
 	}
 
 
-	public OperacionResponseRecord entityToResponse(OperacionEntity operacion, String msgOperacion, String statusEvento) {
+	private OperacionResponseRecord entityToResponse(OperacionEntity operacion, String msgOperacion, String statusEvento) {
 		return new OperacionResponseRecord(operacion.getIdOperacion(), operacion.getFolioOperacion(),
 				operacion.getCuenta().getIdCuenta(), operacion.getMonto(), operacion.getFechaOperacion(),
 				operacion.getEstatus(), msgOperacion, statusEvento);
