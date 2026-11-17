@@ -1,22 +1,12 @@
 package com.demo.tecnico.demo.enums;
 
 public enum OperacionEstatusEnum {
-	PENDIENTE(1, "PENDIENTE"), APLICADA(2, "APLICADA"), RECHAZADA(3, "RECHAZADA"), DUPLICADA(4, "DUPLICADA");
+	PENDIENTE("PENDIENTE"), APLICADA("APLICADA");
 
-	private Integer id;
 	private String nombre;
 
-	private OperacionEstatusEnum(Integer id, String nombre) {
-		this.id = id;
+	private OperacionEstatusEnum(String nombre) {
 		this.nombre = nombre;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public String getNombre() {

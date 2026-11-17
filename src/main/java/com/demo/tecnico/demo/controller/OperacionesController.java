@@ -1,23 +1,20 @@
 package com.demo.tecnico.demo.controller;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.tecnico.demo.model.Cuenta;
-import com.demo.tecnico.demo.model.Evento;
-import com.demo.tecnico.demo.model.Operacion;
-import com.demo.tecnico.demo.model.ReporteFinal;
-import com.demo.tecnico.demo.model.ReporteGlobal;
+import com.demo.tecnico.demo.request.record.OperacionRequestRecord;
+import com.demo.tecnico.demo.response.record.OperacionResponseRecord;
 import com.demo.tecnico.demo.service.OperacionesServices;
+import com.demo.tecnico.demo.service.async.OperacionesAsyncService;
 
 @RestController
 @RequestMapping("/operacion")
@@ -25,51 +22,19 @@ public class OperacionesController {
 
 	@Autowired
 	private OperacionesServices operacionesServices;
+	@Autowired
+	private OperacionesAsyncService operacionesAsyncService;
 
 	@PostMapping
-	public ResponseEntity<Operacion> ejecutaOperacion(@RequestBody Operacion operaion) {
-		operacionesServices.ejecutaOperacion(operaion);
-		return ResponseEntity.status(HttpStatus.OK).body(operaion);
+	public ResponseEntity<OperacionResponseRecord> ejecutaOperacion(@RequestBody OperacionRequestRecord operaion) throws InterruptedException, ExecutionException {
+		return ResponseEntity.status(HttpStatus.OK).body(operacionesAsyncService.ejecutaOperacion(operaion).get());
 	}
 
 	@PostMapping(path = "/operaciones")
-	public ResponseEntity<List<Operacion>> ejecutaOperaciones(@RequestBody List<Operacion> lst) {
-
-		lst.stream().forEach(opera -> {
-			 operacionesServices.ejecutaOperacion(opera);
-		});
-		return ResponseEntity.status(HttpStatus.OK).body(lst);
-	}
-
-	@GetMapping(path = "/reporteFinal")
-	public ResponseEntity<ReporteFinal> generaReporteFinal() {
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.generaReporteFinal());
-	}
-
-	@GetMapping(path = "/reporteGlobal")
-	public ResponseEntity<ReporteGlobal> generaReporteGlobal() {
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.generaReporteGlobal());
-	}
-
-	@GetMapping("/findTopOperaciones")
-	public ResponseEntity<List<Operacion>> findTopOperaciones(@RequestParam int topCount) {
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.obtenTopOperaciones(topCount));
-	}
-
-	@GetMapping(path = "/findHistorialCuenta")
-	public ResponseEntity<List<Evento>> getHistorialCuenta(@RequestParam String idCuenta) {
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.getHistorialCuenta(idCuenta));
+	public ResponseEntity<List<OperacionResponseRecord>> ejecutaOperaciones(@RequestBody List<OperacionRequestRecord> lst) {
+		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.ejecutaOperaciones(lst));
 	}
 
 
-	@GetMapping(path = "/allCuentas")
-	public ResponseEntity<List<Cuenta>> getAllCuentas(){
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.getAllcuentas());
-	}
-
-	@GetMapping(path = "/allEventos")
-	public ResponseEntity<List<Evento>> getAllEventos(){
-		return ResponseEntity.status(HttpStatus.OK).body(operacionesServices.getAllEventos());
-	}
 
 }
