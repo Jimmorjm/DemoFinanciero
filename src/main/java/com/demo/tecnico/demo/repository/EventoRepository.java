@@ -18,8 +18,8 @@ public interface EventoRepository extends JpaRepository<EventoEntity, Integer> {
 	List<EventoEntity> findHistorialCuenta(@Param("idCuentaSend") Integer idCuenta);
 
 	@Query(value = """
-			SELECT e.operacion.cuenta AS cuentaTop, COUNT(DISTINCT e.operacion) AS totalOperaciones FROM EVENTOS e
-			GROUP BY e.operacion.cuenta ORDER BY COUNT(DISTINCT e.operacion) DESC
+			SELECT e.operacion.cuenta AS cuentaTop, COUNT(DISTINCT e.idEvento) AS totalOperaciones FROM EVENTOS e
+			GROUP BY e.operacion.cuenta ORDER BY COUNT(DISTINCT e.idEvento) DESC
 					""")
 	List<CuentaProjection> findTopCuentas(PageRequest of);
 
