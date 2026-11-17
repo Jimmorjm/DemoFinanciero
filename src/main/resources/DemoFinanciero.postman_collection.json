@@ -1,0 +1,151 @@
+{
+  "info": {
+    "_postman_id": "1fe28761-e79b-40be-b297-b3480b30f6cf",
+    "name": "DemoFinanciero",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48794032",
+    "_collection_link": "https://go.postman.co/collection/48794032-1fe28761-e79b-40be-b297-b3480b30f6cf?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "findHistorialCuenta",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/cuenta/findHistorialCuenta?idCuenta=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "cuenta",
+            "findHistorialCuenta"
+          ],
+          "query": [
+            {
+              "key": "idCuenta",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "findTopOperaciones",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/cuenta/findTopCuentas?topCount=3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "cuenta",
+            "findTopCuentas"
+          ],
+          "query": [
+            {
+              "key": "topCount",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "reporteGlobal",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/reportes/reporteGlobal",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reportes",
+            "reporteGlobal"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "reporteFinal",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/reportes/reporteFinal",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "reportes",
+            "reporteFinal"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "operaciones",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[{\r\n    \"folioOperacion\":\"OP0046\",\r\n    \"idCuenta\": 1,\r\n    \"tipoOperacion\": \"CARGO\",\r\n    \"monto\":500.00\r\n}, \r\n{\r\n    \"folioOperacion\":\"OP0047\",\r\n    \"idCuenta\": 2,\r\n   \"tipoOperacion\": \"CARGO\",\r\n    \"monto\":500.00\r\n},\r\n{\r\n    \"folioOperacion\":\"OP0048\",\r\n    \"idCuenta\": 3,\r\n    \"tipoOperacion\": \"CARGO\",\r\n    \"monto\":500.00\r\n}\r\n\r\n{\r\n    \"folioOperacion\":\"OP0049\",\r\n    \"idCuenta\": 4,\r\n    \"tipoOperacion\": \"ABONO\",\r\n    \"monto\":10000.00\r\n}\r\n\r\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/operacion/operaciones",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "operacion",
+            "operaciones"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "allCuentas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/cuenta",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "cuenta"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
